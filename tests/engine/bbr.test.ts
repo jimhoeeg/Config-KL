@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parseTitle } from "@/lib/address";
 import { bbrQuery, mapHeating, pickBuilding } from "@/lib/bbr/client";
 
 describe("BBR mapping", () => {
@@ -20,6 +21,21 @@ describe("BBR mapping", () => {
       ]),
     ).toEqual({ areaM2: 142, yearBuilt: 1972, heating: "olie" });
     expect(pickBuilding([])).toBeNull();
+  });
+
+  it("de-duplicates versions and falls back to year/heating without residential area", () => {
+    // Shape of the live response for Randersvej 8, 4800 (a business address, no residential area).
+    const nodes = [
+      { id_lokalId: "a", byg026Opfoerelsesaar: 1986, byg038SamletBygningsareal: 984, byg039BygningensSamledeBoligAreal: null, byg056Varmeinstallation: "9" },
+      { id_lokalId: "b", byg026Opfoerelsesaar: 1970, byg038SamletBygningsareal: 2393, byg039BygningensSamledeBoligAreal: null, byg056Varmeinstallation: "2", byg057Opvarmningsmiddel: "3" },
+      { id_lokalId: "b", byg026Opfoerelsesaar: 1970, byg038SamletBygningsareal: 2393, byg039BygningensSamledeBoligAreal: null, byg056Varmeinstallation: "2", byg057Opvarmningsmiddel: "3" },
+    ];
+    expect(pickBuilding(nodes)).toEqual({ areaM2: undefined, yearBuilt: 1970, heating: "olie" });
+  });
+
+  it("parses postal code and city from an Adressevælger title", () => {
+    expect(parseTitle("Randersvej 8, 4800 Nykøbing F")).toEqual({ postalCode: "4800", city: "Nykøbing F" });
+    expect(parseTitle("Uden postnummer")).toEqual({});
   });
 
   it("inlines husnummer and time into the query", () => {

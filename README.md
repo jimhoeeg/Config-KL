@@ -44,8 +44,8 @@ RLS is enabled on every table with **no** policies, so the anon key cannot read 
 | `EMAIL_INTERNAL_TO` | yes | Comma-separated recipients of lead notifications |
 | `ADMIN_PASSWORD` | yes | Password for `/admin` |
 | `ADMIN_SESSION_SECRET` | yes | ≥ 32 random characters, signs the admin cookie |
-| `ADDRESS_API_URL` | no | DAWA-compatible address API (default `https://api.dataforsyningen.dk`) |
-| `DATAFORDELER_API_KEY`, `BBR_API_URL` | no | Enables BBR prefill of area, year built and heating |
+| `ADDRESS_API_URL`, `ADRESSEVAELGER_TOKEN` | no | Klimadatastyrelsen's Adressevælger (default `https://adressevaelger.dk`, shared token `adressevaelger123` until you set your own) |
+| `DATAFORDELER_API_KEY`, `BBR_API_URL` | no | Enables BBR prefill of area, year built and heating (default `https://graphql.datafordeler.dk/BBR/v3`) |
 | `EMBED_ALLOWED_ORIGINS` | no | Sites allowed to iframe `/embed` (default klkoleteknik.dk) |
 | `NEXT_PUBLIC_META_PIXEL_ID`, `NEXT_PUBLIC_GA4_ID` | no | Loaded only after cookie consent |
 
@@ -110,8 +110,8 @@ The iframe resizes itself to its content and scrolls the host page to the top of
 
 ## Known limitations / to verify before go-live
 
-- **DAWA** is being phased out by Klimadatastyrelsen. `ADDRESS_API_URL` makes it possible to switch provider. If the lookup fails, the user can still type the address and postal code by hand.
-- **BBR prefill** uses Datafordeler's GraphQL service (`lib/bbr/client.ts`), because the BBR REST service is retired on 15 January 2027. It has not been tested against the live endpoint, which could not be reached from the build environment. Create an IT system and API key at portal.datafordeler.dk (log in with MitID Erhverv), then run `DATAFORDELER_API_KEY=... npm run bbr:check -- <adgangsadresse-id>` and adjust the field names if the schema differs. API keys expire after 2 years.
+- **Address autocomplete** uses Klimadatastyrelsen's Adressevælger (`/husnumre/soeg`), because DAWA closed on 1 October 2026. It currently runs on the shared public token, so request your own token when Klimadatastyrelsen opens user management and set `ADRESSEVAELGER_TOKEN`. If the lookup fails, the user can still type the address and postal code by hand.
+- **BBR prefill** uses Datafordeler's GraphQL service BBR v3 (`lib/bbr/client.ts`), because the BBR REST service is retired on 15 January 2027. It was verified against the live endpoint on 2026-10-26: filter `BBR_Bygning` by `husnummer` and set both `registreringstid` and `virkningstid` to get current versions only. The API key comes from portal.datafordeler.dk (MitID Erhverv) and expires after 2 years. `npm run bbr:check -- <husnummer-id>` tests a key locally.
 - **Price and subsidy assumptions** (ground source range, add-ons, labour share, deduction tax value) are starting values from the brief and must be calibrated by KL Køleteknik.
 - The report is a printable HTML page ("Print / gem som PDF"), not a PDF attachment.
 - The admin uses one shared password. Add Supabase Auth if more people need individual logins.
