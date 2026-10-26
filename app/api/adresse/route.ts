@@ -14,7 +14,10 @@ export async function GET(req: Request) {
     const res = await fetch(`${base}/adresser/autocomplete?q=${encodeURIComponent(q)}&per_side=8`, {
       signal: AbortSignal.timeout(4000),
     });
-    if (!res.ok) return Response.json([], { status: 200 });
+    if (!res.ok) {
+      console.warn(`[adresse] ${base} answered HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+      return Response.json([]);
+    }
     const data = (await res.json()) as {
       tekst: string;
       adresse: { id: string; adgangsadresseid: string; postnr: string; postnrnavn: string };

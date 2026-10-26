@@ -76,7 +76,7 @@ export async function fetchBbr(husnummer: string, apiKey: string, url = BBR_URL)
     body: JSON.stringify({ query: bbrQuery(husnummer) }),
     signal: AbortSignal.timeout(8000),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const json = (await res.json()) as { data?: { BBR_Bygning?: { nodes?: BbrBuilding[] } }; errors?: { message: string }[] };
   if (json.errors?.length) throw new Error(json.errors.map((e) => e.message).join("; "));
   return json.data?.BBR_Bygning?.nodes ?? [];
