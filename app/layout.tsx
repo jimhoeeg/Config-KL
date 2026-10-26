@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Poppins, Raleway } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+// Same typefaces as klkoleteknik.dk: Raleway for headings, Poppins for body text.
+const poppins = Poppins({ variable: "--font-poppins", subsets: ["latin", "latin-ext"], weight: ["300", "400", "500", "600"] });
+const raleway = Raleway({ variable: "--font-raleway", subsets: ["latin", "latin-ext"], weight: ["600", "700", "800"] });
 
 export const metadata: Metadata = {
   title: "Varmepumperådgiveren – KL Køleteknik",
@@ -16,11 +18,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0b4f8a" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#00008f" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="da" className={`${inter.variable} h-full antialiased`}>
+    <html lang="da" className={`${poppins.variable} ${raleway.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">{children}</body>
     </html>
   );

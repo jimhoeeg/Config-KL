@@ -104,7 +104,7 @@ function ChoiceTile<T extends string>({
     >
       {option.icon && <span className={cn("mt-0.5 shrink-0 [&_svg]:size-6", selected ? "text-primary" : "text-muted-foreground")}>{option.icon}</span>}
       <span className="min-w-0 flex-1 pr-5">
-        <span className="block text-sm font-semibold leading-snug">{option.label}</span>
+        <span className="block text-sm font-medium leading-snug">{option.label}</span>
         {option.description && <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{option.description}</span>}
       </span>
       {selected && (
@@ -188,7 +188,7 @@ export function Toggle({ checked, onChange, label }: { checked: boolean | undefi
           aria-checked={checked === o.v}
           onClick={() => onChange(o.v)}
           className={cn(
-            "h-12 rounded-xl border-2 bg-card text-sm font-semibold transition-all",
+            "h-12 rounded-xl border-2 bg-card text-sm font-medium transition-all",
             checked === o.v ? "border-primary bg-secondary" : "border-border hover:border-primary/40",
           )}
         >

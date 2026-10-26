@@ -1,22 +1,18 @@
-import { Wind } from "lucide-react";
+import { HERO_IMAGE } from "@/components/brand/brand";
+import { SiteFooter } from "@/components/brand/SiteFooter";
+import { PageHero, SiteHeader } from "@/components/brand/SiteHeader";
 import { WizardPage } from "@/components/wizard/WizardPage";
 
+/** Standalone landing page, styled as a page on klkoleteknik.dk. */
 export default function Home() {
   return (
     <>
-      <header className="border-b bg-card">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <a href="https://klkoleteknik.dk" className="font-bold text-primary">
-            KL Køleteknik
-          </a>
-          <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Wind className="size-4" /> Varmepumperådgiveren
-          </span>
-        </div>
-      </header>
+      <SiteHeader />
+      <PageHero title="Varmepumperådgiveren" subtitle="Ærlig rådgivning fra din lokale kølemontør – på 4 minutter." image={HERO_IMAGE} />
       <div className="flex-1">
         <WizardPage embedded={false} />
       </div>
+      <SiteFooter />
     </>
   );
 }
