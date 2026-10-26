@@ -1,23 +1,28 @@
 /**
- * BBR lookup via Datafordeler's GraphQL service. Replaces the BBR REST service,
- * which Datafordeler retires on 15 January 2027.
+ * BBR lookup via Datafordeler's GraphQL service (BBR v3). Replaces the BBR REST
+ * service, which Datafordeler retires on 15 January 2027.
  *
- * The address id from the autocomplete (DAWA adgangsadresse id) is the DAR
- * husnummer id, which BBR_Bygning references in its `husnummer` field.
- *
- * NOTE: Not verified against the live endpoint (unreachable from the build
- * environment). Run `npm run bbr:check -- <adgangsadresse-id>` with your key
- * before go-live and adjust field names if the schema differs.
+ * The id from the address autocomplete (Adressevælgeren /husnumre/soeg) is the
+ * DAR husnummer id, which BBR_Bygning references in its `husnummer` field.
+ * Verified against the live endpoint on 2026-10-26.
  */
-export const BBR_URL = process.env.BBR_API_URL || "https://graphql.datafordeler.dk/BBR/v1";
+export const BBR_URL = process.env.BBR_API_URL || "https://graphql.datafordeler.dk/BBR/v3";
 
-/** husnummer must be a validated UUID – it is inlined into the query. */
+/**
+ * husnummer must be a validated UUID – it is inlined into the query. Both
+ * registreringstid and virkningstid are set so BBR returns only the current
+ * version of each building (otherwise every historical registration comes back).
+ */
 export function bbrQuery(husnummer: string, at: Date = new Date()): string {
   const tid = at.toISOString();
   return `{
-  BBR_Bygning(first: 20, registreringstid: "${tid}", virkningstid: "${tid}", where: { husnummer: { eq: "${husnummer}" } }) {
+  BBR_Bygning(first: 50, registreringstid: "${tid}", virkningstid: "${tid}", where: { husnummer: { eq: "${husnummer}" } }) {
     nodes {
+      id_lokalId
+      status
+      byg021BygningensAnvendelse
       byg026Opfoerelsesaar
+      byg038SamletBygningsareal
       byg039BygningensSamledeBoligAreal
       byg056Varmeinstallation
       byg057Opvarmningsmiddel
@@ -29,6 +34,10 @@ export function bbrQuery(husnummer: string, at: Date = new Date()): string {
 type Heating = "olie" | "gas" | "elvarme" | "traepiller" | "fjernvarme" | "gammel_varmepumpe";
 
 export interface BbrBuilding {
+  id_lokalId?: string | null;
+  status?: string | null;
+  byg021BygningensAnvendelse?: string | null;
+  byg038SamletBygningsareal?: number | string | null;
   byg026Opfoerelsesaar?: number | string | null;
   byg039BygningensSamledeBoligAreal?: number | string | null;
   byg056Varmeinstallation?: string | null;
@@ -56,17 +65,34 @@ export function mapHeating(inst?: string | null, middel?: string | null): Heatin
   return undefined;
 }
 
-/** Picks the main dwelling (largest residential area) and maps it to wizard answers. */
+/**
+ * Picks the main dwelling and maps it to wizard answers. Buildings are
+ * de-duplicated by id (the time filters already exclude historical versions).
+ * Prefers the building with the largest residential area. If no building has a
+ * residential area (e.g. a business address), it still returns year built and
+ * heating from the largest building, but no area – a commercial floor area
+ * would be a misleading heated area for the house calculation.
+ */
 export function pickBuilding(buildings: BbrBuilding[]) {
-  const b = buildings
-    .filter((x) => Number(x.byg039BygningensSamledeBoligAreal) > 0)
-    .sort((x, y) => Number(y.byg039BygningensSamledeBoligAreal) - Number(x.byg039BygningensSamledeBoligAreal))[0];
+  const seen = new Set<string>();
+  const current = buildings.filter((b) => {
+    const id = b.id_lokalId ?? JSON.stringify(b);
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+  const num = (v: number | string | null | undefined) => Number(v) || 0;
+  const dwelling = [...current]
+    .filter((b) => num(b.byg039BygningensSamledeBoligAreal) > 0)
+    .sort((x, y) => num(y.byg039BygningensSamledeBoligAreal) - num(x.byg039BygningensSamledeBoligAreal))[0];
+  const b = dwelling ?? [...current].sort((x, y) => num(y.byg038SamletBygningsareal) - num(x.byg038SamletBygningsareal))[0];
   if (!b) return null;
-  return {
-    areaM2: Number(b.byg039BygningensSamledeBoligAreal) || undefined,
-    yearBuilt: Number(b.byg026Opfoerelsesaar) || undefined,
+  const result = {
+    areaM2: dwelling ? num(b.byg039BygningensSamledeBoligAreal) : undefined,
+    yearBuilt: num(b.byg026Opfoerelsesaar) > 1700 ? num(b.byg026Opfoerelsesaar) : undefined,
     heating: mapHeating(b.byg056Varmeinstallation, b.byg057Opvarmningsmiddel),
   };
+  return result.areaM2 || result.yearBuilt || result.heating ? result : null;
 }
 
 export async function fetchBbr(husnummer: string, apiKey: string, url = BBR_URL): Promise<BbrBuilding[]> {
