@@ -111,7 +111,7 @@ The iframe resizes itself to its content and scrolls the host page to the top of
 ## Known limitations / to verify before go-live
 
 - **DAWA** is being phased out by Klimadatastyrelsen. `ADDRESS_API_URL` makes it possible to switch provider. If the lookup fails, the user can still type the address and postal code by hand.
-- **BBR prefill** is untested: Datafordeler could not be reached from the build environment. Verify the endpoint, authentication and field names against your Datafordeler subscription.
+- **BBR prefill** uses Datafordeler's GraphQL service (`lib/bbr/client.ts`), because the BBR REST service is retired on 15 January 2027. It has not been tested against the live endpoint, which could not be reached from the build environment. Create an IT system and API key at portal.datafordeler.dk (log in with MitID Erhverv), then run `DATAFORDELER_API_KEY=... npm run bbr:check -- <adgangsadresse-id>` and adjust the field names if the schema differs. API keys expire after 2 years.
 - **Price and subsidy assumptions** (ground source range, add-ons, labour share, deduction tax value) are starting values from the brief and must be calibrated by KL Køleteknik.
 - The report is a printable HTML page ("Print / gem som PDF"), not a PDF attachment.
 - The admin uses one shared password. Add Supabase Auth if more people need individual logins.
