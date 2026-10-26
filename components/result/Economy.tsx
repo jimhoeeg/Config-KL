@@ -9,6 +9,12 @@ export function EconomyView({ evaluation, economy }: { evaluation: Evaluation; e
   const others = [evaluation.primaryEconomy, ...evaluation.alternativeEconomies].filter((x): x is Economy => !!x && x !== e);
   return (
     <div className="space-y-4">
+      {!evaluation.primaryEconomy && (
+        <div className="rounded-xl border border-primary/15 bg-info-bg p-4 text-sm leading-relaxed">
+          <b className="block text-base">Vi anbefaler det ikke – men du skal stadig kende prisen</b>
+          Vi tror på åbenhed om priser. Her er, hvad {solutionTitles[e.solution].toLowerCase()} ville koste i dit hus, så du selv kan sammenligne med vores anbefaling.
+        </div>
+      )}
       {e.subsidy > 0 && (
         <div className="flex gap-3 rounded-xl border-2 border-accent bg-warning-bg p-4">
           <AlertTriangle className="mt-0.5 size-6 shrink-0 text-accent" />

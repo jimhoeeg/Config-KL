@@ -119,7 +119,9 @@ export function scoreLead(input: ScoringInput, cfg: AppConfig): LeadScore {
   if (opt?.type === "jordvarme") solutionPts = 25;
   else if (opt?.type === "luft_til_vand") solutionPts = 20;
   else if (opt?.type === "luft_til_luft") solutionPts = (opt.indoorUnits ?? 1) > 1 ? 10 : 6;
-  value.push({ label: `Løsning: ${opt?.title ?? "ingen varmepumpe"}`, points: solutionPts });
+  // District heating: the price is shown for transparency, but it is not a realistic project.
+  if (a.heating === "fjernvarme") solutionPts = 0;
+  value.push({ label: `Løsning: ${opt?.title ?? "ingen varmepumpe"}${a.heating === "fjernvarme" ? " (kun vist pga. åbenhed – har fjernvarme)" : ""}`, points: solutionPts });
   if (a.serviceInterest) value.push({ label: "Interesse for serviceabonnement", points: 3 });
 
   // Intent (max 25)

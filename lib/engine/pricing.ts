@@ -119,6 +119,7 @@ export function subsidyFor(option: SolutionOption, a: Answers, cfg: AppConfig): 
   if (option.type !== "luft_til_vand" && option.type !== "jordvarme") return 0;
   const isSommerhus = a.segment === "sommerhus" || a.houseType === "sommerhus";
   if (isSommerhus && !cfg.subsidies.varmepumpepuljenAppliesToSommerhus) return 0;
+  if (a.heating === "fjernvarme" && !cfg.subsidies.varmepumpepuljenAppliesToFjernvarme) return 0;
   return cfg.subsidies.varmepumpepuljen;
 }
 
