@@ -132,11 +132,11 @@ export function StepHuset({ a, set, cfg }: StepProps) {
             areaM2: d.areaM2 ?? a.areaM2,
             yearBuilt: d.yearBuilt ?? a.yearBuilt,
             heating: d.heating ?? a.heating,
-            bbrPrefilled: !!(d.areaM2 || d.yearBuilt),
+            bbrPrefilled: !!(d.areaM2 || d.yearBuilt || d.heating),
           })
         }
       />
-      {a.bbrPrefilled && <Notice>Vi har udfyldt areal og byggeår fra BBR. Ret gerne, hvis det ikke passer – BBR er ikke altid opdateret.</Notice>}
+      {a.bbrPrefilled && <Notice>Vi har hentet husets oplysninger fra BBR (areal, byggeår og opvarmning). Ret gerne, hvis noget ikke passer – BBR er ikke altid opdateret.</Notice>}
       <div className="grid gap-5 sm:grid-cols-2">
         <Question title="Opvarmet areal">
           <NumberField id="area" value={a.areaM2} onChange={(areaM2) => set({ areaM2, bbrPrefilled: false })} min={20} max={600} step={5} suffix="m²" placeholder="fx 140" />
