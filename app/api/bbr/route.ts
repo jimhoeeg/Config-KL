@@ -4,7 +4,8 @@ import { fetchBbr, pickBuilding } from "@/lib/bbr/client";
 /** Optional BBR prefill (enabled only when DATAFORDELER_API_KEY is set). See lib/bbr/client.ts. */
 export async function GET(req: Request) {
   await connection();
-  const key = process.env.DATAFORDELER_API_KEY;
+  // Trim: keys pasted into the Vercel UI often carry a trailing newline or quotes.
+  const key = process.env.DATAFORDELER_API_KEY?.trim().replace(/^["']|["']$/g, "");
   const accessId = new URL(req.url).searchParams.get("accessId");
   if (!key || !accessId || !/^[0-9a-f-]{36}$/i.test(accessId)) return new Response(null, { status: 204 });
   try {
