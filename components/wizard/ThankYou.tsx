@@ -14,7 +14,7 @@ export function ThankYou({
   onRestart,
   onCardOpen,
 }: {
-  done: { reportToken: string | null; wantsInspection: boolean; emailSent: boolean };
+  done: { reportToken: string | null; wantsInspection: boolean; emailSent: boolean; stored?: boolean };
   business: boolean;
   cards: KnowledgeCard[];
   faq: FaqItem[];
@@ -24,6 +24,12 @@ export function ThankYou({
   const inspectionCard = cards.find((c) => c.slug === "besigtigelse");
   return (
     <div className="space-y-6">
+      {done.stored === false && (
+        <p className="rounded-xl border border-accent/30 bg-warning-bg p-4 text-sm">
+          <b>Demoversion:</b> Dine oplysninger er ikke gemt, og der er ikke sendt nogen e-mail. I den færdige version gemmes henvendelsen, kunden får sin rapport på
+          mail, og KL Køleteknik får besked med det samme.
+        </p>
+      )}
       <div className="rounded-2xl border bg-card p-6 text-center shadow-sm sm:p-10">
         <CheckCircle2 className="mx-auto size-14 text-success" />
         <h1 className="mt-4 text-2xl font-bold">{business ? "Tak for din henvendelse!" : done.wantsInspection ? "Tak – vi ringer dig op!" : "Tak – din rapport er på vej!"}</h1>

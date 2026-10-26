@@ -19,7 +19,7 @@ const submitSchema = z.object({
 });
 
 export type SubmitResult =
-  | { ok: true; reportToken: string | null; emailSent: boolean }
+  | { ok: true; reportToken: string | null; emailSent: boolean; stored: boolean }
   | { ok: false; error: string; fieldErrors?: Record<string, string> };
 
 /**
@@ -35,7 +35,7 @@ export async function submitLead(input: unknown): Promise<SubmitResult> {
     return { ok: false, error: "Tjek venligst de markerede felter.", fieldErrors };
   }
   const { sessionId, answers: a, contact, engagement, website } = parsed.data;
-  if (website) return { ok: true, reportToken: null, emailSent: false };
+  if (website) return { ok: true, reportToken: null, emailSent: false, stored: false };
   const cfg = await getConfig();
   const isB2B = a.segment === "erhverv";
 
@@ -144,7 +144,7 @@ export async function submitLead(input: unknown): Promise<SubmitResult> {
     internal.length ? sendEmail({ to: internal, replyTo: contact.email, ...internalMail }) : Promise.resolve(false),
   ]);
 
-  return { ok: true, reportToken, emailSent };
+  return { ok: true, reportToken, emailSent, stored: leadId !== null };
 }
 
 /** Loads a saved session so a user can resume on another device via ?session=<id>. */

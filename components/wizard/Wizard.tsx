@@ -44,7 +44,7 @@ interface Persisted {
   startedAt: number;
   cardsOpened: string[];
   utm?: Record<string, string>;
-  done?: { reportToken: string | null; wantsInspection: boolean; emailSent: boolean };
+  done?: { reportToken: string | null; wantsInspection: boolean; emailSent: boolean; stored?: boolean };
 }
 
 function freshState(): Persisted {
@@ -258,7 +258,7 @@ export function Wizard({
                 engagement={engagement}
                 onDone={(res, wantsInspection) => {
                   trackConversion(wantsInspection ? "inspection" : "report");
-                  setState({ ...state, done: { reportToken: res.reportToken, wantsInspection, emailSent: res.emailSent } });
+                  setState({ ...state, done: { reportToken: res.reportToken, wantsInspection, emailSent: res.emailSent, stored: res.stored } });
                   scrollTop();
                 }}
                 onCta={(mode) => track(state.sessionId, { type: "cta_click", step: step.id, payload: { mode } })}
