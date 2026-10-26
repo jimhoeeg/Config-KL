@@ -1,26 +1,142 @@
 @import "tailwindcss";
 
+/* KL Køleteknik design tokens (shadcn/ui naming). Light only – the module is embedded on a light site. */
 :root {
+  /* Sampled from klkoleteknik.dk: navy logo/CTA band, purple links/icons, near-black headings, grey footer. */
+  --radius: 0.5rem;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #242627;
+  --card: #ffffff;
+  --card-foreground: #242627;
+  --primary: #00008f;
+  --primary-foreground: #ffffff;
+  --secondary: #eeeef8;
+  --secondary-foreground: #00008f;
+  --accent: #5957a7;
+  --accent-foreground: #ffffff;
+  --muted: #f2f2f2;
+  --muted-foreground: #6b6e75;
+  --border: #e3e3ea;
+  --input: #cfd0dc;
+  --ring: #5957a7;
+  --success: #15803d;
+  --warning: #5957a7;
+  --warning-bg: #f3f2fb;
+  --destructive: #b91c1c;
+  --info-bg: #f6f6fb;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-destructive: var(--destructive);
+  --color-info-bg: var(--info-bg);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-raleway), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,
+  h2,
+  h3,
+  .font-heading {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Markdown inside knowledge cards */
+.prose-kl {
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+.prose-kl p,
+.prose-kl ul,
+.prose-kl ol,
+.prose-kl table,
+.prose-kl blockquote {
+  margin-bottom: 0.75rem;
+}
+.prose-kl ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.prose-kl ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.prose-kl li {
+  margin-bottom: 0.25rem;
+}
+.prose-kl strong {
+  font-weight: 600;
+}
+.prose-kl table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  display: block;
+  overflow-x: auto;
+}
+.prose-kl th,
+.prose-kl td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.prose-kl th {
+  background: var(--muted);
+  font-weight: 600;
+}
+.prose-kl blockquote {
+  border-left: 4px solid var(--accent);
+  background: var(--warning-bg);
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.25rem;
+}
+.prose-kl > :last-child {
+  margin-bottom: 0;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
 }
