@@ -38,8 +38,10 @@ describe("recommend", () => {
     const r = recommend({ ...oilHouse, heating: "fjernvarme" }, cfg);
     expect(r.primary.type).toBe("ikke_egnet");
     expect(r.reason).toBe("fjernvarme_installeret");
-    expect(r.alternatives).toEqual([]);
     expect(r.warnings).toEqual([]);
+    // Prices are still shown for transparency, without promising the subsidy.
+    expect(r.alternatives[0].type).toBe("luft_til_vand");
+    expect(r.alternatives[0].why.join(" ")).not.toContain("Varmepumpepuljen");
   });
 
   it("points to district heating first when it is available, with the heat pump as alternative", () => {

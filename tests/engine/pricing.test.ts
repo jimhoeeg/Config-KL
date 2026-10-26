@@ -66,6 +66,17 @@ describe("computeEconomy", () => {
     expect(e.newRunningCost).toBe(Math.round((26090 / 3.5) * 2.5 / 100) * 100);
   });
 
+  it("always shows a price, also when a heat pump is not recommended", () => {
+    const leaky = { ...oilHouse, yearBuilt: 1935, windows: "enkelt" as const, roof: "ingen" as const, walls: "uisoleret" as const };
+    for (const a of [{ ...oilHouse, heating: "fjernvarme" as const }, { ...oilHouse, fjernvarmeAvailable: "ja" as const }, leaky]) {
+      const e = headlineEconomy(evaluate(a, cfg));
+      expect(e).not.toBeNull();
+      expect(e!.price.low).toBeGreaterThan(0);
+    }
+    // No subsidy promised for a house already on district heating.
+    expect(headlineEconomy(evaluate({ ...oilHouse, heating: "fjernvarme" }, cfg))!.subsidy).toBe(0);
+  });
+
   it("returns null for non heat-pump options", () => {
     const r = recommend({ ...oilHouse, heating: "fjernvarme" }, cfg);
     expect(computeEconomy(r.primary, oilHouse, r.heat, cfg)).toBeNull();

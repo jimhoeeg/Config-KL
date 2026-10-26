@@ -82,27 +82,6 @@ export function recommend(a: Answers, cfg: AppConfig): Recommendation {
     ],
   };
 
-  // Honesty rule 1: district heating installed → a heat pump is rarely the right call.
-  if (a.heating === "fjernvarme") {
-    return {
-      heat,
-      warnings: [],
-      reason: "fjernvarme_installeret",
-      primary: {
-        type: "ikke_egnet",
-        title: solutionTitles.ikke_egnet,
-        summary: "Du har allerede fjernvarme. Det er typisk både billigere og grønnere end en varmepumpe, og et skifte tjener sig sjældent hjem.",
-        why: [
-          "Fjernvarme har lave driftsomkostninger og kræver næsten ingen vedligeholdelse.",
-          "Du skal ofte betale en udtrædelsesafgift og fortsat bidrage til nettet, hvis du melder dig ud.",
-          "Et skifte til varmepumpe kræver en ny investering på typisk 100.000 kr. eller mere.",
-        ],
-        caveats: ["Vil du have køling om sommeren, kan en lille luft-til-luft-varmepumpe stadig give mening – men ikke for at spare på varmen."],
-      },
-      alternatives: [],
-    };
-  }
-
   // Pick the heat pump that fits the house best.
   let best: SolutionOption;
   const alternatives: SolutionOption[] = [];
@@ -127,6 +106,28 @@ export function recommend(a: Answers, cfg: AppConfig): Recommendation {
     best = l2v;
     if (a.garden === "stor" || a.garden === "mellem") alternatives.push(ground);
     alternatives.push(l2lSupplement);
+  }
+
+  // Honesty rule 1: district heating installed → a heat pump is rarely the right call.
+  if (a.heating === "fjernvarme") {
+    return {
+      heat,
+      warnings: [],
+      reason: "fjernvarme_installeret",
+      primary: {
+        type: "ikke_egnet",
+        title: solutionTitles.ikke_egnet,
+        summary: "Du har allerede fjernvarme. Det er typisk både billigere og grønnere end en varmepumpe, og et skifte tjener sig sjældent hjem.",
+        why: [
+          "Fjernvarme har lave driftsomkostninger og kræver næsten ingen vedligeholdelse.",
+          "Du skal ofte betale en udtrædelsesafgift og fortsat bidrage til nettet, hvis du melder dig ud.",
+          "Et skifte til varmepumpe kræver en ny investering på typisk 100.000 kr. eller mere.",
+        ],
+        caveats: ["Vil du have køling om sommeren, kan en lille luft-til-luft-varmepumpe stadig give mening – men ikke for at spare på varmen."],
+      },
+      // Transparency: still show what the best heat pump would cost, so the customer can judge for themselves.
+      alternatives: [best, ...alternatives].slice(0, 2).map(withoutSubsidyPromise),
+    };
   }
 
   // Honesty rule 2: district heating available on the street → explain before selling a heat pump.
@@ -237,6 +238,15 @@ function groundSource(a: Answers, heat: HeatDemandResult): SolutionOption {
     why,
     caveats: ["Kræver gravearbejde på grunden – typisk 1,5–2 gange husets opvarmede areal til vandrette jordslanger.", "Prisen er et skøn og skal bekræftes ved besigtigelse."],
     sizeKw: heat.sizeKw,
+  };
+}
+
+/** For a house on district heating we cannot promise the subsidy – replace that line with a caveat. */
+function withoutSubsidyPromise(o: SolutionOption): SolutionOption {
+  return {
+    ...o,
+    why: o.why.filter((w) => !w.includes("Varmepumpepuljen")),
+    caveats: [...o.caveats, "Det er ikke sikkert, at du kan få tilskud fra Varmepumpepuljen, når du skifter fra fjernvarme – tjek de gældende regler."],
   };
 }
 

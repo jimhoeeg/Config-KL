@@ -81,6 +81,8 @@ export const defaultConfig = {
     /** Varmepumpepuljen 2026 – fixed, tax-free. Air-to-water and ground source only. */
     varmepumpepuljen: 27000,
     varmepumpepuljenAppliesToSommerhus: false,
+    /** Shown price for a house already on district heating: assume no subsidy unless confirmed. */
+    varmepumpepuljenAppliesToFjernvarme: false,
     /** Håndværkerfradrag 2026: max deductible labour per adult. */
     craftsmanDeductionPerPerson: 9000,
     /** Approximate tax value of a deduction. */
