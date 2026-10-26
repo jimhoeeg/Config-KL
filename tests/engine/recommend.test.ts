@@ -39,6 +39,7 @@ describe("recommend", () => {
     expect(r.primary.type).toBe("ikke_egnet");
     expect(r.reason).toBe("fjernvarme_installeret");
     expect(r.alternatives).toEqual([]);
+    expect(r.warnings).toEqual([]);
   });
 
   it("points to district heating first when it is available, with the heat pump as alternative", () => {

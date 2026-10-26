@@ -65,7 +65,7 @@ export function EconomyView({ evaluation, economy }: { evaluation: Evaluation; e
           <div className="mb-2 text-sm font-semibold">Til sammenligning</div>
           <dl className="space-y-1.5 text-sm">
             {others.map((o) => (
-              <Row key={o.solution} label={solutionTitles[o.solution]} value={`${krRange(o.netPrice)} · spar ${kr(o.annualSaving)}/år`} />
+              <Row key={o.solution} label={solutionTitles[o.solution]} value={`${krRange(o.netPrice)}, spar ${kr(o.annualSaving)}/år`} />
             ))}
           </dl>
         </div>
@@ -77,8 +77,8 @@ export function EconomyView({ evaluation, economy }: { evaluation: Evaluation; e
 function Row({ label, value, bold, muted, className }: { label: string; value: string; bold?: boolean; muted?: boolean; className?: string }) {
   return (
     <div className={`flex justify-between gap-4 ${bold ? "border-t pt-2 font-bold" : ""} ${muted ? "text-muted-foreground" : ""} ${className ?? ""}`}>
-      <dt>{label}</dt>
-      <dd className="shrink-0 text-right tabular-nums">{value}</dd>
+      <dt className="min-w-0">{label}</dt>
+      <dd className="max-w-[60%] text-right tabular-nums">{value}</dd>
     </div>
   );
 }

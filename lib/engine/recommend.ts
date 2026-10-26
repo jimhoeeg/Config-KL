@@ -86,7 +86,7 @@ export function recommend(a: Answers, cfg: AppConfig): Recommendation {
   if (a.heating === "fjernvarme") {
     return {
       heat,
-      warnings,
+      warnings: [],
       reason: "fjernvarme_installeret",
       primary: {
         type: "ikke_egnet",
